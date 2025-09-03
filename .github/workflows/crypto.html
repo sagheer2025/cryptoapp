@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryptoPay - Secure Payment Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#0f172a; --panel:#111827; --muted:#6b7280; --text:#e5e7eb;
+      --accent:#22c55e; --accent2:#60a5fa; --danger:#ef4444; --warn:#f59e0b;
+      --card:#1f2937; --border:#374151;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --pending-bg: rgba(245, 158, 11, 0.15);
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b1024,#131a39 60%,#0b1024);
+      color:var(--text);
+      min-height:100vh;
+      line-height:1.6;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 18px;
+      border-bottom:1px solid var(--border);
+      background:#0b1024bb;
+      backdrop-filter: blur(6px);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .brand{
+      font-weight:700;
+      letter-spacing:.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand i {
+      color: var(--accent);
+    }
+    nav button{
+      margin-left:8px;
+      border:1px solid var(--border);
+      background:transparent;
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      transition: all 0.3s ease;
+    }
+    nav button:hover {
+      background: rgba(96, 165, 250, 0.1);
+    }
+    nav button.active{
+      border-color:var(--accent2);
+      box-shadow:0 0 0 2px #60a5fa55 inset;
+      background: rgba(96, 165, 250, 0.2);
+    }
+    main{
+      padding:18px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:16px;
+      margin-bottom:18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2{
+      margin:8px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .row{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .col{
+      flex:1 1 280px;
+    }
+    input,select,textarea{
+      width:100%;
+      padding:12px 14px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:#0b1024;
+      color:var(--text);
+      font-size: 1rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+    }
+    label{
+      font-size:.9rem;
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+    .btn{
+      padding:12px 16px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn.primary{
+      background:var(--accent2);
+      color:#0b1024;
+    }
+    .btn.primary:hover {
+      background: #3b82f6;
+    }
+    .btn.success{
+      background:var(--accent);
+      color:#0b1024;
+    }
+    .btn.success:hover {
+      background: #16a34a;
+    }
+    .btn.warn{
+      background:var(--warn);
+      color:#0b1024;
+    }
+    .btn.warn:hover {
+      background: #eab308;
+    }
+    .btn.danger{
+      background:var(--danger);
+      color:#fff;
+    }
+    .btn.danger:hover {
+      background: #dc2626;
+    }
+    .btn.outline{
+      background:transparent;
+      border:1px solid var(--border);
+      color:var(--text);
+    }
+    .btn.outline:hover {
+      background: rgba(55, 65, 81, 0.5);
+    }
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:12px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      padding:20px;
+      border-radius:12px;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:8px;
+      border:1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th,td{
+      border-bottom:1px solid var(--border);
+      padding:12px 15px;
+      font-size:.92rem;
+      vertical-align:top;
+      text-align: left;
+    }
+    th{
+      background:#0b1024aa;
+    }
+    tr:hover td{
+      background:#0b102455;
+    }
+    .pill{
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:.8rem;
+      display:inline-block;
+      font-weight: 500;
+    }
+    .pill.paid{
+      background:var(--success-bg);
+      border:1px solid #10b98155;
+      color:#34d399;
+    }
+    .pill.pending{
+      background:var(--pending-bg);
+      border:1px solid #f59e0b55;
+      color:#fbbf24;
+    }
+    .pill.cancel{
+      background:rgba(239, 68, 68, 0.15);
+      border:1px solid #ef444455;
+      color:#f87171;
+    }
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .grid-3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:14px;
+    }
+    .hidden{
+      display:none !important;
+    }
+    .float-support{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      z-index:20;
+    }
+    .float-support a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      background:#1f2937;
+      border:1px solid var(--border);
+      padding:10px 16px;
+      border-radius:999px;
+      color:var(--text);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .float-support a:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+    }
+    .mono{
+      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      word-break:break-all;
+    }
+    .hr{
+      height:1px;
+      background:var(--border);
+      margin:10px 0;
+    }
+    .note{
+      font-size:.85rem;
+      color:var(--muted);
+      line-height: 1.5;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--accent2);
+      color: var(--text);
+      padding: 14px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background-color: var(--danger); }
+    .toast.success { background-color: var(--accent); }
+    .security-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .password-toggle { 
+      position: relative; 
+      margin-top: 5px;
+    }
+    .password-toggle input { 
+      padding-right: 50px; 
+    }
+    .password-toggle .toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 5px;
+    }
+    .pin-mask {
+      letter-spacing: 2px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .user-info {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .user-info-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .user-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .detail-card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .detail-card .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .detail-card .value {
+      font-weight: 500;
+    }
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 10px 0;
+    }
+    .stat-card .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .row {
+        flex-direction: column;
+      }
+      .col {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <i class="fas fa-coins"></i>
+      <span id="brandName">CryptoPay</span>
+    </div>
+    <nav>
+      <button id="tabUser" class="active"><i class="fas fa-user"></i> User</button>
+      <button id="tabAdmin"><i class="fas fa-cog"></i> Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- User Panel -->
+    <section id="userPanel" class="panel">
+      <h2><i class="fas fa-user"></i> User Panel</h2>
+
+      <!-- Authentication Area -->
+      <div id="authArea">
+        <div class="grid-2">
+          <!-- Registration Card -->
+          <div class="card">
+            <h3><i class="fas fa-user-plus"></i> Create an Account</h3>
+            <div class="form-group">
+              <label>Full Name</label>
+              <label for="regName">zantora</label><input id="regName" placeholder="e.g., Haider Khan"/>
+            </div>
+            <div class="form-group">
+              <label>Phone (WhatsApp)</label>
+              <input id="regPhone" placeholder="e.g., 919876543210"/>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input id="regEmail" type="email" placeholder="optional@email.com"/>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <div class="password-toggle">
+                <input id="regPass" type="password" placeholder="Choose a secure password"/>
+                <button class="toggle-btn" data-target="regPass">👁️</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <div class="password-toggle">
+                <input id="regConfirmPass" type="password" placeholder="Confirm your password"/>
+                <button class="toggle-btn" data-target="regConfirmPass">👁️</button>
+              </div>
+            </div>
+            <div style="margin-top:20px">
+              <button id="btnRegister" class="btn success" style="width:100%">
+                <i class="fas fa-user-plus"></i> Register
+              </button>
+            </div>
+          </div>
+          
+          <!-- Login Card -->
+          <div class="card">
+            <h3><i class="fas fa-sign-in-alt"></i> Login to Your Account</h3>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input id="loginPhone" placeholder="Your registered phone"/>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <div class="password-toggle">
+                <input id="loginPass" type="password" placeholder="Enter your password"/>
+                <button class="toggle-btn" data-target="loginPass">👁️</button>
+              </div>
+            </div>
+            <div style="margin-top:20px">
+              <button id="btnLogin" class="btn primary" style="width:100%">
+                <i class="fas fa-sign-in-alt"></i> Login
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Dashboard -->
+      <div id="userDashboard" class="hidden">
+        <div class="user-info">
+          <div class="user-info-header">
+            <h3><i class="fas fa-user-circle"></i> Your Account</h3>
+            <button id="btnLogout" class="btn outline">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+          
+          <div id="currentUserBox" class="user-details">
+            <!-- Dynamically filled with user info -->
+          </div>
+        </div>
+
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <i class="fas fa-wallet fa-2x"></i>
+            <div class="value" id="totalBalance">₹0</div>
+            <div class="label">Total Balance</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-coins fa-2x"></i>
+            <div class="value" id="totalOrders">0</div>
+            <div class="label">Total Orders</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-check-circle fa-2x"></i>
+            <div class="value" id="completedOrders">0</div>
+            <div class="label">Completed</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-clock fa-2x"></i>
+            <div class="value" id="pendingOrders">0</div>
+            <div class="label">Pending</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-header">
+            <h3><i class="fas fa-shopping-cart"></i> Buy Crypto</h3>
+          </div>
+          <div id="buyArea">
+            <div class="row">
+              <div class="col">
+                <label>Coin</label>
+                <select id="coinSelect"></select>
+              </div>
+              <div class="col">
+                <label>Amount</label>
+                <input id="amount" type="number" min="0" placeholder="e.g., 5000"/>
+              </div>
+              <div class="col">
+                <label>Currency</label>
+                <select id="currency">
+                  <option value="INR">INR</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Payment Mode</label>
+                <select id="payMode"></select>
+              </div>
+              <div class="col">
+                <label>Reference / Txn Hash</label>
+                <input id="payRef" placeholder="Paste UTR / Txn ID / Hash"/>
+              </div>
+            </div>
+            <div class="card" id="paymentInstruction" style="margin-top:15px">
+              Select a payment mode to see instructions.
+            </div>
+            <button id="btnPlaceOrder" class="btn primary" style="margin-top:15px; width:100%">
+              <i class="fas fa-paper-plane"></i> Place Order
+            </button>
+            <div class="note" style="margin-top:15px">
+              After paying in your chosen app, paste the reference above and place order. Admin will verify and mark as Paid.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-header">
+            <h3><i class="fas fa-history"></i> My Orders</h3>
+          </div>
+          <div id="myOrders" class="muted">Loading your orders...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="adminPanel" class="panel hidden">
+      <h2><i class="fas fa-cog"></i> Admin Panel</h2>
+
+      <div id="adminGate" class="card">
+        <div class="row">
+          <div class="col">
+            <label>Enter Admin PIN</label>
+            <div class="password-toggle">
+              <input id="adminPin" type="password" placeholder="Enter your admin PIN"/>
+              <button class="toggle-btn" data-target="adminPin">👁️</button>
+            </div>
+          </div>
+          <div class="col" style="display:flex;align-items:end">
+            <button id="btnAdminLogin" class="btn success">
+              <i class="fas fa-lock-open"></i> Unlock Admin
+            </button>
+          </div>
+        </div>
+        <div class="note">Default PIN: 1234 - Change it in Settings for security</div>
+      </div>
+
+      <div id="adminArea" class="hidden">
+        <div class="kpis">
+          <div class="card">
+            <div class="muted">Total Users</div>
+            <div id="kpiUsers" style="font-size:1.6rem;font-weight:700">0</div>
+          </div>
+          <div class="card">
+            <div class="muted">Total Orders</div>
+            <div id="kpiOrders" style="font-size:1.6rem;font-weight:700">0</div>
+          </div>
+          <div class="card">
+            <div class="muted">Paid Amount Received</div>
+            <div id="kpiPaid" style="font-size:1.6rem;font-weight:700">₹0</div>
+          </div>
+          <div class="card">
+            <div class="muted">Pending Amount</div>
+            <div id="kpiPending" style="font-size:1.6rem;font-weight:700">₹0</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn outline" data-adtab="users"><i class="fas fa-users"></i> Users</button>
+            <button class="btn outline" data-adtab="orders"><i class="fas fa-shopping-cart"></i> Orders</button>
+            <button class="btn outline" data-adtab="payments"><i class="fas fa-credit-card"></i> Payment Modes</button>
+            <button class="btn outline" data-adtab="coins"><i class="fas fa-coins"></i> Coins</button>
+            <button class="btn outline" data-adtab="settings"><i class="fas fa-cog"></i> Settings</button>
+            <button id="btnAdminLogout" class="btn danger" style="margin-left:auto">
+              <i class="fas fa-lock"></i> Lock
+            </button>
+          </div>
+        </div>
+
+        <div id="adUsers" class="card">
+          <h3><i class="fas fa-users"></i> Registered Users</h3>
+          <div id="usersTable"></div>
+        </div>
+
+        <div id="adOrders" class="card">
+          <h3><i class="fas fa-shopping-cart"></i> Orders (Buy Requests)</h3>
+          <div id="ordersTable"></div>
+        </div>
+
+        <div id="adPayments" class="card hidden">
+          <h3><i class="fas fa-credit-card"></i> Payment Modes</h3>
+          <div class="grid-2">
+            <div>
+              <div class="row">
+                <div class="col">
+                  <label>Name</label><input id="pmName" placeholder="e.g., UPI"/>
+                </div>
+                <div class="col">
+                  <label>Type</label>
+                  <select id="pmType">
+                    <option>UPI</option><option>Bank</option><option>BinancePay</option><option>Crypto</option><option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label>Details / Instructions</label>
+                  <textarea id="pmDetails" rows="3" placeholder="merchant@upi OR Bank: 0000..., IFSC: XXXX"></textarea>
+                </div>
+                <div class="col">
+                  <label>Note (optional)</label>
+                  <input id="pmNote" placeholder="Any extra info"/>
+                </div>
+              </div>
+              <button id="btnAddPm" class="btn success">
+                <i class="fas fa-plus"></i> Add Payment Mode
+              </button>
+            </div>
+            <div>
+              <div id="paymentsTable"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="adCoins" class="card hidden">
+          <h3><i class="fas fa-coins"></i> Coins</h3>
+          <div class="row">
+            <div class="col">
+              <label>Symbol</label><input id="coinSym" placeholder="e.g., UHDT"/>
+            </div>
+            <div class="col">
+              <label>Name</label><input id="coinName" placeholder="e.g., Ultra Dollar Token"/>
+            </div>
+            <div class="col" style="display:flex;align-items:end">
+              <button id="btnAddCoin" class="btn success">
+                <i class="fas fa-plus"></i> Add Coin
+              </button>
+            </div>
+          </div>
+          <div id="coinsTable" style="margin-top:10px"></div>
+        </div>
+
+        <div id="adSettings" class="card hidden">
+          <h3><i class="fas fa-cog"></i> Settings</h3>
+          <div class="row">
+            <div class="col">
+              <label>Brand Name</label><input id="setBrand" placeholder="Brand"/>
+            </div>
+            <div class="col">
+              <label>WhatsApp Number (with country code)</label><input id="setWA" placeholder="919999999999"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label>Telegram Link</label><input id="setTG" placeholder="https://t.me/your_support"/>
+            </div>
+          </div>
+          
+          <div class="hr"></div>
+          
+          <h4><i class="fas fa-shield-alt"></i> Security Settings</h4>
+          <div class="security-box">
+            <p class="note">Current Admin PIN: <span id="currentPinDisplay" class="pin-mask">••••</span></p>
+            <div class="grid-3">
+              <div class="password-toggle">
+                <label>Current PIN</label>
+                <input id="setCurrentPin" type="password" placeholder="Enter current PIN"/>
+              </div>
+              <div class="password-toggle">
+                <label>New PIN</label>
+                <input id="setNewPin" type="password" placeholder="New PIN (min 4 digits)"/>
+              </div>
+              <div class="password-toggle">
+                <label>Confirm New PIN</label>
+                <input id="setConfirmPin" type="password" placeholder="Confirm new PIN"/>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <button id="btnChangePin" class="btn warn">
+                <i class="fas fa-key"></i> Change Admin PIN
+              </button>
+            </div>
+            <div class="note" style="margin-top:8px">Note: PIN is never displayed in plain text for security reasons.</div>
+          </div>
+          
+          <div style="margin-top:16px">
+            <button id="btnSaveSettings" class="btn primary">
+              <i class="fas fa-save"></i> Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="float-support">
+    <a id="waLink" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <a id="tgLink" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram</a>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  // ---------- Storage & State ----------
+  const KEY = 'cryptoApp.v3';
+  let state = {
+    users: [],
+    orders: [],
+    payments: [],
+    coins: [],
+    admin: {pin:'1234',brand:'CryptoPay Demo',supportWA:'919999999999',supportTG:'https://t.me/your_support'},
+    session: {admin:false,currentUserId:null},
+    counters: {user:1, order:1, payment:1, coin:1}
+  };
+
+  // ---------- Toast Notification ----------
+  function showToast(message, type = 'info', duration = 3000) {
+    const toast = $('#toast');
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+    toast.className = 'toast';
+    if (type === 'success') toast.classList.add('success');
+    else if (type === 'error') toast.classList.add('error');
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, duration);
+  }
+
+  function load(){
+    try{
+      const s = localStorage.getItem(KEY);
+      if(s){ state = JSON.parse(s); }
+      else seed();
+    }catch(e){ console.error('load error', e); seed(); }
+  }
+  
+  function save(){ 
+    localStorage.setItem(KEY, JSON.stringify(state)); 
+  }
+
+  function seed(){
+    state.coins = [
+      {id:1,symbol:'BTC',name:'Bitcoin'}, 
+      {id:2,symbol:'ETH',name:'Ethereum'},
+      {id:3,symbol:'USDT',name:'Tether USDt'}, 
+      {id:4,symbol:'BNB',name:'Binance Coin'}
+    ];
+    
+    state.payments = [
+      {id:1,name:'UPI',type:'UPI',details:'merchant@upi\nNote: Include your phone number',note:'Available 9am-9pm',active:true},
+      {id:2,name:'Bank Transfer',type:'Bank',details:'Acct: 0123456789\nIFSC: ABCD0123456\nName: CryptoPay Ltd',note:'NEFT/IMPS/RTGS accepted',active:true},
+      {id:3,name:'Binance Pay',type:'BinancePay',details:'Pay ID: 123456789\nMemo: Your phone number',note:'USDT-TRC20 preferred',active:true}
+    ];
+    
+    // Add sample users for demo
+    state.users = [
+      {
+        id: 1,
+        name: "Alex Morgan",
+        phone: "919876543210",
+        email: "alex@example.com",
+        password: "password123",
+        createdAt: Date.now() - 86400000 // 1 day ago
+      },
+      {
+        id: 2,
+        name: "Taylor Swift",
+        phone: "919999999999",
+        email: "taylor@example.com",
+        password: "password123",
+        createdAt: Date.now() - 172800000 // 2 days ago
+      }
+    ];
+    
+    // Add sample orders for demo
+    state.orders = [
+      {
+        id: 1,
+        userId: 1,
+        userName: "Alex Morgan",
+        userPhone: "919876543210",
+        userEmail: "alex@example.com",
+        coin: "BTC",
+        amount: 25000,
+        currency: "INR",
+        paymentModeId: 1,
+        paymentModeName: "UPI",
+        paymentDetails: "merchant@upi",
+        reference: "UTR123456789",
+        status: "Paid",
+        createdAt: Date.now() - 43200000 // 12 hours ago
+      },
+      {
+        id: 2,
+        userId: 1,
+        userName: "Alex Morgan",
+        userPhone: "919876543210",
+        userEmail: "alex@example.com",
+        coin: "ETH",
+        amount: 1500,
+        currency: "USD",
+        paymentModeId: 3,
+        paymentModeName: "Binance Pay",
+        paymentDetails: "Pay ID: 123456789",
+        reference: "TX987654321",
+        status: "Pending",
+        createdAt: Date.now() - 3600000 // 1 hour ago
+      }
+    ];
+    
+    state.counters = {
+      user: 3,
+      order: 3,
+      payment: 4,
+      coin: 5
+    };
+    
+    save();
+  }
+
+  // ---------- Helpers ----------
+  const $ = (sel)=>document.querySelector(sel);
+  const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
+  
+  const fmtMoney = (n,cur='INR') => {
+    const nf = new Intl.NumberFormat('en-IN',{style:'currency',currency:cur,maximumFractionDigits:2});
+    try { return nf.format(Number(n||0)); } catch{ return `${cur} ${n}`; }
+  };
+  
+  const fmtDate = (t)=> new Date(t).toLocaleString();
+  
+  function statusPill(s){
+    if(s==='Paid') return '<span class="pill paid">Paid</span>';
+    if(s==='Cancelled') return '<span class="pill cancel">Cancelled</span>';
+    return '<span class="pill pending">Pending</span>';
+  }
+
+  function currentUser(){
+    return state.users.find(u=>u.id===state.session.currentUserId)||null;
+  }
+
+  // ---------- UI Switching & Views ----------
+  const tabUser = $('#tabUser'), tabAdmin = $('#tabAdmin');
+  const userPanel = $('#userPanel'), adminPanel = $('#adminPanel');
+
+  tabUser.addEventListener('click',()=>{
+    tabUser.classList.add('active'); tabAdmin.classList.remove('active');
+    userPanel.classList.remove('hidden'); adminPanel.classList.add('hidden');
+  });
+  
+  tabAdmin.addEventListener('click',()=>{
+    tabAdmin.classList.add('active'); tabUser.classList.remove('active');
+    adminPanel.classList.remove('hidden'); userPanel.classList.add('hidden');
+  });
+
+  function updateUserView() {
+    const user = currentUser();
+    const authArea = $('#authArea');
+    const dashboard = $('#userDashboard');
+    
+    if (user) {
+      authArea.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+      renderDashboardHeader();
+      renderMyOrders();
+      updateDashboardStats();
+    } else {
+      authArea.classList.remove('hidden');
+      dashboard.classList.add('hidden');
+    }
+  }
+  
+  function updateDashboardStats() {
+    const user = currentUser();
+    if (!user) return;
+    
+    const userOrders = state.orders.filter(o => o.userId === user.id);
+    const totalOrders = userOrders.length;
+    const completedOrders = userOrders.filter(o => o.status === 'Paid').length;
+    const pendingOrders = userOrders.filter(o => o.status === 'Pending').length;
+    const totalBalance = userOrders
+      .filter(o => o.status === 'Paid')
+      .reduce((sum, o) => sum + Number(o.amount || 0), 0);
+    
+    $('#totalOrders').textContent = totalOrders;
+    $('#completedOrders').textContent = completedOrders;
+    $('#pendingOrders').textContent = pendingOrders;
+    $('#totalBalance').textContent = fmtMoney(totalBalance, 'INR');
+  }
+
+  // ---------- Renderers: User ----------
+  function renderBrand(){ 
+    $('#brandName').textContent = state.admin.brand || 'CryptoPay Demo'; 
+  }
+  
+  function renderSupportLinks(){
+    const phone = (state.admin.supportWA||'').replace(/[^0-9]/g,'');
+    $('#waLink').href = phone ? `https://wa.me/${phone}` : '#';
+    $('#tgLink').href = state.admin.supportTG || '#';
+  }
+
+  function renderDashboardHeader(){
+    const user = currentUser();
+    if (!user) return;
+    
+    const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    
+    $('#currentUserBox').innerHTML = `
+      <div class="detail-card">
+        <div class="label">Account Information</div>
+        <div class="user-avatar">${initials}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Full Name</div>
+        <div class="value">${user.name}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Phone</div>
+        <div class="value">${user.phone || 'Not provided'}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Email</div>
+        <div class="value">${user.email || 'Not provided'}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Member Since</div>
+        <div class="value">${fmtDate(user.createdAt)}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Account Status</div>
+        <div class="value"><span class="pill paid">Verified</span></div>
+      </div>
+    `;
+  }
+
+  function renderCoins(){
+    const sel = $('#coinSelect');
+    sel.innerHTML = state.coins.map(c => 
+      `<option value="${c.symbol}">${c.symbol} — ${c.name}</option>`
+    ).join('');
+  }
+
+  function renderPayModes(){
+    const sel = $('#payMode');
+    sel.innerHTML = state.payments
+      .filter(p => p.active !== false)
+      .map(p => `<option value="${p.id}">${p.name}</option>`)
+      .join('');
+    updatePaymentInstruction();
+  }
+
+  function updatePaymentInstruction(){
+    const id = Number($('#payMode').value);
+    const pm = state.payments.find(p => p.id === id);
+    $('#paymentInstruction').innerHTML = pm ? `
+      <div class="muted">Pay using <strong>${pm.name}</strong></div>
+      <pre class="mono" style="white-space:pre-wrap">${pm.details || ''}</pre>
+      ${pm.note ? `<div class="note">${pm.note}</div>` : ''}
+    ` : 'Select a payment mode to see instructions.';
+  }
+
+  function renderMyOrders(){
+    const user = currentUser();
+    const wrap = $('#myOrders');
+    if(!user){ 
+      wrap.innerHTML = '<div class="muted">Login first.</div>'; 
+      return; 
+    }
+    
+    const list = state.orders
+      .filter(o => o.userId === user.id)
+      .sort((a,b) => b.id - a.id);
+    
+    if(!list.length){ 
+      wrap.innerHTML = '<div class="muted">No orders yet.</div>'; 
+      return; 
+    }
+    
+    wrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Coin</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Reference</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(o => `
+            <tr>
+              <td>#${o.id}</td>
+              <td>${o.coin}</td>
+              <td>${fmtMoney(o.amount, o.currency)}</td>
+              <td>${o.paymentModeName}</td>
+              <td class="mono">${o.reference || '-'}</td>
+              <td>${statusPill(o.status)}</td>
+              <td>${fmtDate(o.createdAt)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // ---------- Actions: User Auth ----------
+  $('#btnRegister').addEventListener('click', () => {
+    const name = $('#regName').value.trim();
+    const phone = $('#regPhone').value.trim();
+    const email = $('#regEmail').value.trim();
+    const pass = $('#regPass').value;
+    const confirmPass = $('#regConfirmPass').value;
+
+    if (!name || !phone || !pass) {
+      return showToast('Name, phone, and password are required', 'error');
+    }
+    
+    if (pass !== confirmPass) {
+      return showToast('Passwords do not match', 'error');
+    }
+    
+    if (state.users.some(u => u.phone === phone)) {
+      return showToast('A user with this phone number already exists', 'error');
+    }
+
+    const user = {
+      id: state.counters.user++,
+      name, 
+      phone, 
+      email, 
+      password: pass,
+      createdAt: Date.now()
+    };
+    
+    state.users.push(user);
+    state.session.currentUserId = user.id;
+    save();
+    
+    // Reset form
+    $('#regName').value = '';
+    $('#regPhone').value = '';
+    $('#regEmail').value = '';
+    $('#regPass').value = '';
+    $('#regConfirmPass').value = '';
+    
+    updateUserView();
+    renderAdminKPIs();
+    showToast('Registration successful! Welcome.', 'success');
+  });
+
+  $('#btnLogin').addEventListener('click', () => {
+    const phone = $('#loginPhone').value.trim();
+    const pass = $('#loginPass').value;
+    
+    if (!phone || !pass) {
+      return showToast('Please enter phone and password', 'error');
+    }
+
+    const user = state.users.find(u => u.phone === phone);
+    if (!user) {
+      return showToast('User not found. Please register first.', 'error');
+    }
+    
+    if (user.password !== pass) {
+      return showToast('Incorrect password.', 'error');
+    }
+    
+    state.session.currentUserId = user.id;
+    save();
+    
+    // Reset form
+    $('#loginPhone').value = '';
+    $('#loginPass').value = '';
+    
+    updateUserView();
+    showToast(`Welcome back, ${user.name}`, 'success');
+  });
+
+  $('#btnLogout').addEventListener('click', () => {
+    state.session.currentUserId = null;
+    save();
+    updateUserView();
+    showToast('You have been logged out', 'info');
+  });
+  
+  // ---------- Actions: User Dashboard ----------
+  $('#payMode').addEventListener('change', updatePaymentInstruction);
+
+  $('#btnPlaceOrder').addEventListener('click', () => {
+    const user = currentUser();
+    if(!user) return showToast('Please login first', 'error');
+    
+    const coin = $('#coinSelect').value;
+    const amount = Number($('#amount').value);
+    const currency = $('#currency').value;
+    const pmId = Number($('#payMode').value);
+    const ref = $('#payRef').value.trim();
+    
+    if(!coin || !amount || !pmId) {
+      return showToast('Please fill coin, amount and payment mode', 'error');
+    }
+    
+    if(amount <= 0) {
+      return showToast('Amount must be greater than zero', 'error');
+    }
+    
+    const pm = state.payments.find(p => p.id === pmId);
+    const order = {
+      id: state.counters.order++,
+      userId: user.id, 
+      userName: user.name, 
+      userPhone: user.phone, 
+      userEmail: user.email,
+      coin, 
+      amount, 
+      currency,
+      paymentModeId: pmId, 
+      paymentModeName: pm?.name || '', 
+      paymentDetails: pm?.details || '',
+      reference: ref, 
+      status: 'Pending', 
+      createdAt: Date.now()
+    };
+    
+    state.orders.push(order); 
+    save();
+    
+    // Reset form
+    $('#amount').value = ''; 
+    $('#payRef').value = '';
+    
+    renderMyOrders(); 
+    renderAdminKPIs(); 
+    renderOrdersTable();
+    updateDashboardStats();
+    
+    showToast('Order placed. Admin will verify.', 'success');
+  });
+
+  // ---------- Renderers: Admin ----------
+  function renderAdminKPIs(){
+    $('#kpiUsers').textContent = state.users.length;
+    $('#kpiOrders').textContent = state.orders.length;
+    
+    const paidAmtINR = state.orders
+      .filter(o => o.status === 'Paid' && o.currency === 'INR')
+      .reduce((sum, o) => sum + Number(o.amount || 0), 0);
+      
+    const pendAmtINR = state.orders
+      .filter(o => o.status !== 'Paid' && o.currency === 'INR')
+      .reduce((sum, o) => sum + Number(o.amount || 0), 0);
+      
+    $('#kpiPaid').textContent = fmtMoney(paidAmtINR, 'INR');
+    $('#kpiPending').textContent = fmtMoney(pendAmtINR, 'INR');
+  }
+
+  function renderUsersTable(){
+    const rows = state.users
+      .sort((a,b) => b.id - a.id)
+      .map(u => `
+        <tr>
+          <td>#${u.id}</td>
+          <td>${u.name}<div class="muted mono">${u.email || ''}</div></td>
+          <td class="mono">${u.phone || ''}</td>
+          <td>${fmtDate(u.createdAt)}</td>
+        </tr>
+      `).join('');
+      
+    $('#usersTable').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="4" class="muted">No users</td></tr>'}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderOrdersTable(){
+    const rows = state.orders
+      .sort((a,b) => b.id - a.id)
+      .map(o => `
+        <tr>
+          <td>#${o.id}</td>
+          <td>
+            ${o.userName}
+            <div class="muted mono">${o.userPhone}</div>
+          </td>
+          <td>${o.coin}</td>
+          <td>${fmtMoney(o.amount, o.currency)}</td>
+          <td>${o.paymentModeName}</td>
+          <td class="mono">${o.reference || '-'}</td>
+          <td>${statusPill(o.status)}</td>
+          <td>${fmtDate(o.createdAt)}</td>
+          <td>
+            <button class="btn success" data-act="markPaid" data-id="${o.id}">
+              <i class="fas fa-check"></i> Paid
+            </button>
+            <button class="btn warn" data-act="markPending" data-id="${o.id}">
+              <i class="fas fa-clock"></i> Pending
+            </button>
+            <button class="btn danger" data-act="markCancel" data-id="${o.id}">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      
+    $('#ordersTable').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Coin</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Reference</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="9" class="muted">No orders</td></tr>'}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderPaymentsTable(){
+    const rows = state.payments
+      .map(pm => `
+        <tr>
+          <td>#${pm.id}</td>
+          <td>${pm.name}<div class="note">${pm.type}</div></td>
+          <td class="mono">${(pm.details || '').replace(/\n/g, '<br/>')}</td>
+          <td>${pm.note || ''}</td>
+          <td>
+            ${pm.active === false ? 
+              '<span class="pill cancel">Inactive</span>' : 
+              '<span class="pill paid">Active</span>'}
+          </td>
+          <td>
+            <button class="btn warn" data-act="togglePm" data-id="${pm.id}">
+              ${pm.active === false ? '<i class="fas fa-toggle-on"></i> Activate' : '<i class="fas fa-toggle-off"></i> Deactivate'}
+            </button>
+            <button class="btn danger" data-act="delPm" data-id="${pm.id}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      
+    $('#paymentsTable').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Details</th>
+            <th>Note</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="6" class="muted">No payment modes</td></tr>'}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderCoinsTable(){
+    const rows = state.coins
+      .map(c => `
+        <tr>
+          <td>#${c.id}</td>
+          <td>${c.symbol}</td>
+          <td>${c.name || ''}</td>
+          <td>
+            <button class="btn danger" data-act="delCoin" data-id="${c.id}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      
+    $('#coinsTable').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="4" class="muted">No coins</td></tr>'}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // ---------- Admin Actions ----------
+  $$('#adminPanel [data-adtab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.adtab;
+      const tabs = ['Users', 'Orders', 'Payments', 'Coins', 'Settings'];
+      
+      tabs.forEach(t => {
+        $(`#ad${t}`).classList.add('hidden');
+      });
+      
+      $(`#ad${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+    });
+  });
+
+  // Universal password visibility toggle
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.toggle-btn')) {
+      const targetId = e.target.dataset.target;
+      const passwordInput = document.getElementById(targetId);
+      if (passwordInput) {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          e.target.textContent = '🙈';
+        } else {
+          passwordInput.type = 'password';
+          e.target.textContent = '👁️';
+        }
+      }
+    }
+  });
+
+  $('#btnAdminLogin').addEventListener('click', () => {
+    const pin = $('#adminPin').value.trim();
+    
+    if(pin === state.admin.pin){
+      state.session.admin = true; 
+      save();
+      
+      $('#adminGate').classList.add('hidden');
+      $('#adminArea').classList.remove('hidden');
+      
+      renderAdminKPIs(); 
+      renderUsersTable(); 
+      renderOrdersTable(); 
+      renderPaymentsTable(); 
+      renderCoinsTable();
+      
+      $('#setBrand').value = state.admin.brand || ''; 
+      $('#setWA').value = state.admin.supportWA || '';
+      $('#setTG').value = state.admin.supportTG || '';
+      
+      // Clear PIN fields
+      $('#setCurrentPin').value = ''; 
+      $('#setNewPin').value = ''; 
+      $('#setConfirmPin').value = '';
+      
+      showToast('Admin unlocked successfully', 'success');
+    } else {
+      showToast('Incorrect PIN', 'error');
+    }
+  });
+
+  $('#btnAdminLogout').addEventListener('click', () => {
+    state.session.admin = false; 
+    save();
+    
+    $('#adminArea').classList.add('hidden');
+    $('#adminGate').classList.remove('hidden');
+    $('#adminPin').value = '';
+    
+    showToast('Admin panel locked', 'info');
+  });
+
+  $('#adOrders').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]'); 
+    if(!b) return;
+    
+    const id = Number(b.dataset.id);
+    const o = state.orders.find(x => x.id === id); 
+    if(!o) return;
+    
+    if(b.dataset.act === 'markPaid') o.status = 'Paid';
+    if(b.dataset.act === 'markPending') o.status = 'Pending';
+    if(b.dataset.act === 'markCancel') o.status = 'Cancelled';
+    
+    save(); 
+    renderOrdersTable(); 
+    renderAdminKPIs(); 
+    renderMyOrders();
+    updateDashboardStats();
+    
+    showToast(`Order #${o.id} updated to ${o.status}`, 'success');
+  });
+
+  $('#btnAddPm').addEventListener('click', () => {
+    const name = $('#pmName').value.trim(); 
+    const details = $('#pmDetails').value.trim();
+    
+    if(!name || !details) {
+      return showToast('Name and details required', 'error');
+    }
+    
+    state.payments.push({
+      id: state.counters.payment++,
+      name, 
+      type: $('#pmType').value, 
+      details, 
+      note: $('#pmNote').value, 
+      active: true
+    });
+    
+    save(); 
+    
+    // Clear form
+    $('#pmName').value = ''; 
+    $('#pmDetails').value = ''; 
+    $('#pmNote').value = '';
+    
+    renderPaymentsTable(); 
+    renderPayModes();
+    
+    showToast('Payment mode added', 'success');
+  });
+
+  $('#adPayments').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]'); 
+    if(!b) return;
+    
+    const id = Number(b.dataset.id);
+    const pm = state.payments.find(p => p.id === id); 
+    if(!pm) return;
+    
+    if(b.dataset.act === 'togglePm') { 
+      pm.active = !pm.active; 
+      showToast(`Payment mode "${pm.name}" ${pm.active ? 'activated' : 'deactivated'}`, 'info');
+    }
+    
+    if(b.dataset.act === 'delPm') { 
+      if(!confirm('Are you sure you want to delete this payment mode?')) return; 
+      state.payments = state.payments.filter(p => p.id !== id); 
+      showToast('Payment mode deleted', 'info');
+    }
+    
+    save(); 
+    renderPaymentsTable(); 
+    renderPayModes();
+  });
+
+  $('#btnAddCoin').addEventListener('click', () => {
+    const sym = ($('#coinSym').value || '').trim().toUpperCase();
+    
+    if(!sym) {
+      return showToast('Symbol required', 'error');
+    }
+    
+    if(state.coins.some(c => c.symbol === sym)) {
+      return showToast('Coin already exists', 'error');
+    }
+    
+    state.coins.push({
+      id: state.counters.coin++,
+      symbol: sym, 
+      name: ($('#coinName').value || '').trim()
+    });
+    
+    save(); 
+    
+    // Clear form
+    $('#coinSym').value = ''; 
+    $('#coinName').value = '';
+    
+    renderCoinsTable(); 
+    renderCoins();
+    
+    showToast('Coin added successfully', 'success');
+  });
+
+  $('#adCoins').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]'); 
+    if(!b) return;
+    
+    const id = Number(b.dataset.id);
+    
+    if(b.dataset.act === 'delCoin') {
+      if(!confirm('Are you sure you want to delete this coin?')) return;
+      state.coins = state.coins.filter(c => c.id !== id);
+      save(); 
+      renderCoinsTable(); 
+      renderCoins();
+      showToast('Coin deleted', 'info');
+    }
+  });
+
+  $('#btnSaveSettings').addEventListener('click', () => {
+    state.admin.brand = $('#setBrand').value.trim();
+    state.admin.supportWA = $('#setWA').value.trim();
+    state.admin.supportTG = $('#setTG').value.trim();
+    
+    save(); 
+    renderBrand(); 
+    renderSupportLinks();
+    
+    showToast('Settings saved successfully', 'success');
+  });
+  
+  $('#btnChangePin').addEventListener('click', function() {
+    const current = $('#setCurrentPin').value; 
+    const newPin = $('#setNewPin').value;
+    const confirmPin = $('#setConfirmPin').value;
+    
+    if (!current || !newPin || !confirmPin) {
+      return showToast('All PIN fields required', 'error');
+    }
+    
+    if (current !== state.admin.pin) {
+      return showToast('Current PIN is incorrect', 'error');
+    }
+    
+    if (newPin.length < 4) {
+      return showToast('New PIN must be at least 4 digits', 'error');
+    }
+    
+    if (newPin !== confirmPin) {
+      return showToast('New PINs do not match', 'error');
+    }
+    
+    state.admin.pin = newPin; 
+    save();
+    
+    // Clear PIN fields
+    $('#setCurrentPin').value = ''; 
+    $('#setNewPin').value = ''; 
+    $('#setConfirmPin').value = '';
+    
+    showToast('Admin PIN changed successfully', 'success');
+  });
+
+  // ---------- Init ----------
+  function init(){
+    load();
+    renderBrand();
+    renderSupportLinks();
+    updateUserView();
+    renderCoins();
+    renderPayModes();
+    renderAdminKPIs();
+    
+    // Set up tab switching
+    tabUser.click();
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
